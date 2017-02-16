@@ -3,8 +3,8 @@ var runQuery = require('../lib/run-query.js')
 var cipher = require('../lib/cipher.js')
 var decipher = require('../lib/decipher.js')
 var Connection = require('../models/Connection.js')
-var mustBeAdmin = require('../middleware/must-be-admin.js')
-var mustBeAuthenticated = require('../middleware/must-be-authenticated.js')
+
+
 
 function connectionFromBody (body) {
   return {
@@ -24,7 +24,7 @@ function connectionFromBody (body) {
   }
 }
 
-router.get('/api/connections', mustBeAuthenticated, function (req, res) {
+router.get('/api/connections', function (req, res) {
   Connection.findAll(function (err, connections) {
     if (err) {
       console.error(err)
@@ -43,7 +43,7 @@ router.get('/api/connections', mustBeAuthenticated, function (req, res) {
   })
 })
 
-router.get('/api/connections/:_id', mustBeAuthenticated, function (req, res) {
+router.get('/api/connections/:_id', function (req, res) {
   Connection.findOneById(req.params._id, function (err, connection) {
     if (err) {
       console.error(err)
@@ -65,7 +65,7 @@ router.get('/api/connections/:_id', mustBeAuthenticated, function (req, res) {
 })
 
 // create
-router.post('/api/connections', mustBeAdmin, function (req, res) {
+router.post('/api/connections', function (req, res) {
   var connection = new Connection(connectionFromBody(req.body))
   connection.username = cipher(connection.username || '')
   connection.password = cipher(connection.password || '')
@@ -87,7 +87,7 @@ router.post('/api/connections', mustBeAdmin, function (req, res) {
 })
 
 // update
-router.put('/api/connections/:_id', mustBeAdmin, function (req, res) {
+router.put('/api/connections/:_id', function (req, res) {
   Connection.findOneById(req.params._id, function (err, connection) {
     if (err) {
       console.error(err)
@@ -130,7 +130,7 @@ router.put('/api/connections/:_id', mustBeAdmin, function (req, res) {
 })
 
 // delete
-router.delete('/api/connections/:_id', mustBeAdmin, function (req, res) {
+router.delete('/api/connections/:_id', function (req, res) {
   Connection.removeOneById(req.params._id, function (err) {
     if (err) {
       console.error(err)
@@ -143,7 +143,7 @@ router.delete('/api/connections/:_id', mustBeAdmin, function (req, res) {
 })
 
 // test connection
-router.post('/api/test-connection', mustBeAdmin, function testConnection (req, res) {
+router.post('/api/test-connection', function testConnection (req, res) {
   var bodyConnection = connectionFromBody(req.body)
   var testQuery = "SELECT 'success' AS TestQuery;"
   if (bodyConnection.driver === 'crate') {

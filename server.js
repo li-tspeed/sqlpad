@@ -38,7 +38,6 @@ var favicon = require('serve-favicon')
 var cookieParser = require('cookie-parser')
 var cookieSession = require('cookie-session')
 var morgan = require('morgan')
-var passport = require('passport')
 var errorhandler = require('errorhandler')
 
 var app = express()
@@ -56,8 +55,6 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieParser(PASSPHRASE)) // populates req.cookies with an object
 app.use(cookieSession({secret: PASSPHRASE}))
-app.use(passport.initialize())
-app.use(passport.session())
 app.use(BASE_URL, express.static(path.join(__dirname, 'build')))
 if (DEBUG) app.use(morgan('dev'))
 app.use(function (req, res, next) {
@@ -69,15 +66,9 @@ app.use(function (req, res, next) {
   res.locals.queryMenu = false
   res.locals.session = req.session || null
   res.locals.pageTitle = ''
-  res.locals.user = req.user
-  res.locals.isAuthenticated = req.isAuthenticated()
   res.locals.baseUrl = BASE_URL
   next()
 })
-
-/*  Passport setup
-============================================================================= */
-require('./middleware/passport.js')
 
 /*  Routes
 
@@ -93,17 +84,13 @@ var routers = [
   require('./routes/homepage.js'),
   require('./routes/app.js'),
   require('./routes/version.js'),
-  require('./routes/users.js'),
-  require('./routes/forgot-password.js'),
-  require('./routes/password-reset.js'),
   require('./routes/connections.js'),
   require('./routes/queries.js'),
   require('./routes/query-result.js'),
   require('./routes/download-results.js'), // streams result download to browser
   require('./routes/schema-info.js'),
   require('./routes/config-values.js'),
-  require('./routes/tags.js'),
-  require('./routes/signup-signin-signout.js')
+  require('./routes/tags.js')
 ]
 
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && PUBLIC_URL) {
